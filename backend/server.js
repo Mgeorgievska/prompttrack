@@ -6,6 +6,7 @@ const pool = require("./db");
 const promptRoutes = require("./routes/promptRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const tagRoutes = require("./routes/tagRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/categories", categoryRoutes);
 app.use("/api/tags", tagRoutes );
+app.use("/api/favorites", favoriteRoutes);
 
 app.get("/", (req, res) => {
     res.json({
