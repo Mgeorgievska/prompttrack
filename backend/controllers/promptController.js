@@ -1,10 +1,14 @@
 const pool = require("../db");
 
+
 const getAllPrompts = async (req, res) => {
-    console.log("GET ALL PROMPTS CALLED");
+    console.log(req.query);
+
     try {
 
-        const result = await pool.query(`
+        const { search, category } = req.query;
+
+        let query = `
             SELECT
                 p.id,
                 p.title,
@@ -14,17 +18,53 @@ const getAllPrompts = async (req, res) => {
             FROM prompts p
             JOIN categories c
                 ON p.category_id = c.id
-            ORDER BY p.id;
-        `);
-       
+        `;
+
+        const conditions = [];
+        const values = [];
+
+        if (search) {
+
+            values.push(`%${search}%`);
+
+            conditions.push(
+                `LOWER(p.title) LIKE LOWER($${values.length})`
+            );
+
+        }
+
+        if (category && category !== "All") {
+
+            values.push(category);
+
+            conditions.push(
+                `c.name = $${values.length}`
+            );
+
+        }
+
+        if (conditions.length > 0) {
+
+            query += " WHERE " + conditions.join(" AND ");
+
+        }
+
+        query += " ORDER BY p.id";
+
+        const result = await pool.query(query, values);
 
         res.json(result.rows);
+
     } catch (err) {
+
         console.error(err);
+
         res.status(500).json({
             error: "Database error"
         });
+
     }
+
 };
 
 const getPromptById = async (req, res) => {

@@ -16,28 +16,7 @@ function Home() {
 
     useEffect(() => {
 
-        fetchPrompts();
-        fetchCategories();
-
-    }, []);
-
-    const fetchPrompts = async () => {
-
-        try {
-
-            const response = await api.get("/prompts");
-
-            setPrompts(response.data);
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-    };
-
-    const fetchCategories = async () => {
+    async function loadCategories() {
 
         try {
 
@@ -51,22 +30,52 @@ function Home() {
 
         }
 
-    };
+    }
 
-    const filteredPrompts = prompts.filter((prompt) => {
+    loadCategories();
 
-        const matchesSearch =
-            prompt.title
-                .toLowerCase()
-                .includes(search.toLowerCase());
+}, []);
 
-        const matchesCategory =
-            selectedCategory === "All" ||
-            prompt.category === selectedCategory;
+useEffect(() => {
 
-        return matchesSearch && matchesCategory;
+    async function loadPrompts() {
 
-    });
+        try {
+             console.log("Fetching prompts:", {
+                search,
+                selectedCategory
+            });
+
+            const response = await api.get("/prompts", {
+
+                params: {
+
+                    search,
+                    category: selectedCategory
+
+                }
+
+            });
+
+            setPrompts(response.data);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+    loadPrompts();
+
+}, [search, selectedCategory]);
+
+    
+    
+
+
+    
 
     return (
 
@@ -99,11 +108,11 @@ function Home() {
                     />
 
                     <p>
-                        Showing {filteredPrompts.length} prompts
+                        Showing {prompts.length} prompts
                     </p>
 
                     {
-                        filteredPrompts.map((prompt) => (
+                        prompts.map((prompt) => (
 
                             <PromptCard
                                 key={prompt.id}
