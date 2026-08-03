@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import PromptCard from "../components/PromptCard";
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 function Home() {
     const [prompts, setPrompts] = useState([]);
@@ -24,20 +26,42 @@ function Home() {
     }, []);
 
     return (
-        <div>
-            <h1>PromptTrack </h1>
-            <h2>AI Prompt Library</h2>
+    <>
 
-            <p>Number of prompts: {prompts.length}</p>
+        <Navbar />
 
-            {prompts.map((prompt) => (
-                <PromptCard
-                    key={prompt.id}
-                    prompt={prompt}
-                />
-            ))}
+        <div
+            style={{
+                display: "flex"
+            }}
+        >
+
+            <Sidebar />
+
+            <div
+                style={{
+                    flex: 1,
+                    padding: "20px"
+                }}
+            >
+
+                {
+                    prompts.map(prompt => (
+
+                        <PromptCard
+                            key={prompt.id}
+                            prompt={prompt}
+                        />
+
+                    ))
+                }
+
+            </div>
+
         </div>
-    );
+
+    </>
+);
 }
 
 export default Home;

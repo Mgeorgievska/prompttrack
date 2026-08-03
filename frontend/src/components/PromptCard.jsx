@@ -1,22 +1,40 @@
 function PromptCard({ prompt }) {
 
     return (
-        <div className="prompt-card">
 
-            <h2>
-                {prompt.title}
-            </h2>
+        <div
+            style={{
+                border: "1px solid #ddd",
+                borderRadius: "10px",
+                padding: "15px",
+                marginBottom: "15px"
+            }}
+        >
 
-            <p>
-                {prompt.description}
-            </p>
+            <h3>{prompt.title}</h3>
 
-            <span>
-                Category: {prompt.category}
-            </span>
+            <p>{prompt.description}</p>
+
+            <small>
+                {prompt.category}
+            </small>
+
+            <br /><br />
+
+            <button>Edit</button>
+
+            <button style={{ marginLeft: "10px" }}>
+                Delete
+            </button>
+
+            <button style={{ marginLeft: "10px" }}>
+                ⭐
+            </button>
 
         </div>
+
     );
+
 }
 
 export default PromptCard;
