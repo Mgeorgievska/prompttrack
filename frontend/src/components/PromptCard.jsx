@@ -1,4 +1,65 @@
-function PromptCard({ prompt }) {
+// import { useState } from "react";
+
+import {
+    addFavorite,
+    removeFavorite
+} from "../api/favorites";
+
+
+
+
+function PromptCard({
+    prompt,
+    favorites,
+    setFavorites
+}) {
+
+    console.log("PromptCard:", prompt.id, favorites);
+    console.log({
+    prompt,
+    favorites
+});
+
+    const isFavorite = (favorites || []).some(
+    (fav) => fav.prompt_id === prompt.id
+);
+
+
+    const handleFavorite = async () => {
+        console.log("Clicked!", prompt.id);
+
+        try {
+
+            if (isFavorite) {
+
+                await removeFavorite(prompt.id);
+
+                setFavorites(
+                    favorites.filter(
+                        (fav) => fav.prompt_id !== prompt.id
+                    )
+                );
+
+            } else {
+
+                const response = await addFavorite(prompt.id);
+
+                setFavorites([
+                    ...favorites,
+                    response.favorite
+                ]);
+
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    };
+
 
     return (
 
@@ -11,30 +72,42 @@ function PromptCard({ prompt }) {
             }}
         >
 
-            <h3>{prompt.title}</h3>
+            <h3>
+                {prompt.title}
+            </h3>
 
-            <p>{prompt.description}</p>
 
-            <small>
-                {prompt.category}
-            </small>
+            <p>
+                {prompt.description}
+            </p>
 
-            <br /><br />
 
-            <button>Edit</button>
+            <p>
+                Category: {prompt.category}
+            </p>
 
-            <button style={{ marginLeft: "10px" }}>
-                Delete
+
+            <pre>
+                {prompt.content}
+            </pre>
+
+
+            <button
+                onClick={handleFavorite}
+            >
+                {
+                    isFavorite
+                    ? "⭐ Remove favorite"
+                    : "☆ Add favorite"
+                }
             </button>
 
-            <button style={{ marginLeft: "10px" }}>
-                ⭐
-            </button>
 
         </div>
 
     );
 
 }
+
 
 export default PromptCard;
