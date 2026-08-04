@@ -4,6 +4,8 @@ import {
     addFavorite,
     removeFavorite
 } from "../api/favorites";
+import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -23,6 +25,32 @@ function PromptCard({
     const isFavorite = (favorites || []).some(
     (fav) => fav && fav.prompt_id === prompt.id
 );
+   const navigate = useNavigate();
+
+   const handleDelete = async () => {
+
+    const confirmDelete = window.confirm(
+        "Delete this prompt?"
+    );
+
+
+    if (!confirmDelete) return;
+
+
+    try {
+
+        await api.delete(`/prompts/${prompt.id}`);
+
+        window.location.reload();
+
+
+    } catch(error) {
+
+        console.error(error);
+
+    }
+
+};
 
 
     const handleFavorite = async () => {
@@ -100,6 +128,19 @@ function PromptCard({
                     ? "⭐ Remove favorite"
                     : "☆ Add favorite"
                 }
+            </button>
+
+            <button
+                onClick={() => navigate(`/edit/${prompt.id}`)}
+            >
+            Edit
+            </button>
+
+
+            <button
+                onClick={handleDelete}
+            >
+            Delete
             </button>
 
 
