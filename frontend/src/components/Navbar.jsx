@@ -1,4 +1,9 @@
+import { useNavigate } from "react-router-dom";
+
 function Navbar() {
+
+    const navigate = useNavigate();
+
     return (
         <nav
             style={{
@@ -9,11 +14,21 @@ function Navbar() {
                 borderBottom: "1px solid #ddd"
             }}
         >
-            <h2>PromptTrack</h2>
+            <h2
+                style={{
+                    cursor: "pointer"
+                }}
+                onClick={() => navigate("/")}
+            >
+                PromptTrack
+            </h2>
 
-            <button>
+            <button
+                onClick={() => navigate("/new")}
+            >
                 + New Prompt
             </button>
+
         </nav>
     );
 }
