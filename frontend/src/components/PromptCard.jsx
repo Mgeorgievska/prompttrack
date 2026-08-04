@@ -21,7 +21,7 @@ function PromptCard({
 });
 
     const isFavorite = (favorites || []).some(
-    (fav) => fav.prompt_id === prompt.id
+    (fav) => fav && fav.prompt_id === prompt.id
 );
 
 
@@ -46,7 +46,7 @@ function PromptCard({
 
                 setFavorites([
                     ...favorites,
-                    response.favorite
+                    response
                 ]);
 
             }

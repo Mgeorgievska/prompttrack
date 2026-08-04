@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import SearchBar from "../components/SearchBar";
 import PromptCard from "../components/PromptCard";
+import { getFavorites } from "../api/favorites";
 
 function Home() {
 
@@ -13,6 +14,30 @@ function Home() {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [search, setSearch] = useState("");
+    const [favorites, setFavorites] = useState([]);
+
+    useEffect(() => {
+        async function loadFavorites () {
+
+    try {
+
+        const data = await getFavorites();
+
+        console.log("Favorites response:", data);
+
+        setFavorites(data);
+
+    } catch(error) {
+
+        console.error(error);
+
+    }
+
+}  
+    loadFavorites();
+
+    }, []);
+
 
     useEffect(() => {
 
@@ -31,7 +56,7 @@ function Home() {
         }
 
     }
-
+    
     loadCategories();
 
 }, []);
@@ -117,8 +142,9 @@ useEffect(() => {
                             <PromptCard
                                 key={prompt.id}
                                 prompt={prompt}
+                                favorites={favorites}
+                                setFavorites={setFavorites}
                             />
-
                         ))
                     }
 
