@@ -3,8 +3,12 @@ node_modules/
 
 # Environment variables
 .env
+<<<<<<< Updated upstream
 .env.*
 
+=======
+*.env.production
+>>>>>>> Stashed changes
 
 # Build folders
 dist/
