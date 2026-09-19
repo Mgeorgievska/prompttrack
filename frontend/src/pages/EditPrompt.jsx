@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import api from "../api/axios";
-
+import Navbar from "../components/Navbar";
 
 function EditPrompt() {
-
     const { id } = useParams();
     const navigate = useNavigate();
-
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -16,153 +14,200 @@ function EditPrompt() {
     const [categoryId, setCategoryId] = useState("");
 
     const [categories, setCategories] = useState([]);
-
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-
-        async function loadData() {
-
+        const loadData = async () => {
             try {
+                setLoading(true);
 
-                const promptResponse =
-                    await api.get(`/prompts/${id}`);
+                const promptResponse = await api.get(
+                    `/prompts/${id}`
+                );
 
-
-                const categoryResponse =
-                    await api.get("/categories");
-
+                const categoryResponse = await api.get(
+                    "/categories"
+                );
 
                 const prompt = promptResponse.data;
 
+                setTitle(prompt.title || "");
+                setDescription(prompt.description || "");
+                setContent(prompt.content || "");
 
-                setTitle(prompt.title);
-                setDescription(prompt.description);
-                setContent(prompt.content);
-                setCategoryId(prompt.category_id);
+                if (
+                    prompt.category_id !== undefined &&
+                    prompt.category_id !== null
+                ) {
+                    setCategoryId(String(prompt.category_id));
+                }
 
+                setCategories(
+                    Array.isArray(categoryResponse.data)
+                        ? categoryResponse.data
+                        : []
+                );
+            } catch (error) {
+                console.error(
+                    "Failed to load prompt:",
+                    error
+                );
 
-                setCategories(categoryResponse.data);
-
-
-            } catch(error) {
-
-                console.error(error);
-
+                alert("Failed to load prompt.");
+            } finally {
+                setLoading(false);
             }
-
-        }
-
+        };
 
         loadData();
-
-
     }, [id]);
 
-
-
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
-
-        try {
-
-            await api.put(`/prompts/${id}`, {
-
-                title,
-                description,
-                content,
-                category_id: categoryId
-
-            });
-
-
-            navigate("/");
-
-
-        } catch(error) {
-
-            console.error(error);
-
+        if (!categoryId) {
+            alert("Please select a category.");
+            return;
         }
 
+        try {
+            setSaving(true);
+
+            await api.put(`/prompts/${id}`, {
+                title: title,
+                description: description,
+                content: content,
+                category_id: Number(categoryId)
+            });
+
+            navigate("/");
+        } catch (error) {
+            console.error(
+                "Failed to update prompt:",
+                error
+            );
+
+            alert("Failed to update prompt.");
+        } finally {
+            setSaving(false);
+        }
     };
 
+    if (loading) {
+        return (
+            <div className="form-page">
+                <Navbar />
+
+                <div className="form-container">
+                    <div className="form-header">
+                        <h1>Edit Prompt</h1>
+                        <p>Loading prompt...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
+        <div className="form-page">
+            <Navbar />
 
-        <div style={{padding:"30px"}}>
+            <div className="form-container">
+                <div className="form-header">
+                    <h1>Edit Prompt</h1>
 
-            <h2>Edit Prompt</h2>
+                    <p>
+                        Update your reusable prompt.
+                    </p>
+                </div>
 
-
-            <form onSubmit={handleSubmit}>
-
-
-                <input
-                    value={title}
-                    onChange={(e)=>setTitle(e.target.value)}
-                />
-
-
-                <br/><br/>
-
-
-                <input
-                    value={description}
-                    onChange={(e)=>setDescription(e.target.value)}
-                />
-
-
-                <br/><br/>
-
-
-                <textarea
-                    value={content}
-                    onChange={(e)=>setContent(e.target.value)}
-                />
-
-
-                <br/><br/>
-
-
-                <select
-                    value={categoryId}
-                    onChange={(e)=>setCategoryId(e.target.value)}
+                <form
+                    className="prompt-form"
+                    onSubmit={handleSubmit}
                 >
+                    <div className="form-group">
+                        <label>TITLE</label>
 
-                    {
-                        categories.map(category => (
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) =>
+                                setTitle(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
 
-                            <option
-                                key={category.id}
-                                value={category.id}
-                            >
-                                {category.name}
-                            </option>
+                    <div className="form-group">
+                        <label>DESCRIPTION</label>
 
-                        ))
-                    }
+                        <input
+                            type="text"
+                            value={description}
+                            onChange={(e) =>
+                                setDescription(e.target.value)
+                            }
+                        />
+                    </div>
 
-                </select>
+                    <div className="form-group">
+                        <label>CATEGORY</label>
 
+                        <select
+                            value={categoryId}
+                            onChange={(e) =>
+                                setCategoryId(e.target.value)
+                            }
+                            required
+                        >
+                            {categories.map((category) => (
+                                <option
+                                    key={category.id}
+                                    value={String(category.id)}
+                                >
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                <br/><br/>
+                    <div className="form-group">
+                        <label>PROMPT CONTENT</label>
 
+                        <textarea
+                            value={content}
+                            onChange={(e) =>
+                                setContent(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
 
-                <button type="submit">
-                    Save Changes
-                </button>
+                    <div className="form-actions">
+                        <button
+                            type="button"
+                            className="cancel-button"
+                            onClick={() => navigate("/")}
+                            disabled={saving}
+                        >
+                            Cancel
+                        </button>
 
-
-            </form>
-
-
+                        <button
+                            type="submit"
+                            className="save-button"
+                            disabled={saving || !categoryId}
+                        >
+                            {saving
+                                ? "Saving..."
+                                : "Save Changes"}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-
     );
-
 }
-
 
 export default EditPrompt;

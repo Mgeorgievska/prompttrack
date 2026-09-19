@@ -73,19 +73,20 @@ const getPromptById = async (req, res) => {
 
         const { id } = req.params;
 
-        const result = await pool.query(
-            `SELECT
-                p.id,
-                p.title,
-                p.description,
-                p.content,
-                c.name AS category
-             FROM prompts p
-             JOIN categories c
-             ON p.category_id = c.id
-             WHERE p.id = $1`,
-            [id]
-        );
+       const result = await pool.query(
+    `SELECT
+        p.id,
+        p.title,
+        p.description,
+        p.content,
+        p.category_id,
+        c.name AS category
+     FROM prompts p
+     JOIN categories c
+         ON p.category_id = c.id
+     WHERE p.id = $1`,
+    [id]
+);
 
         if (result.rows.length === 0) {
             return res.status(404).json({

@@ -7,37 +7,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Docker
-*.tar
-backend.tar
-frontend.tar
 
-# Dependencies
-node_modules/
-
-# Build
-dist/
-dist-ssr/
-build/
-
-# Environment variables
-.env
-.env.*
-!.env.example
-
-# Local files
+node_modules
+dist
+dist-ssr
 *.local
 
-# IDE
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea/
-
-# OS
+.idea
 .DS_Store
-Thumbs.db
-
-# Visual Studio
 *.suo
 *.ntvs*
 *.njsproj

@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../api/axios";
+import Navbar from "../components/Navbar";
 
 function NewPrompt() {
-
     const navigate = useNavigate();
 
     const [title, setTitle] = useState("");
@@ -14,125 +15,182 @@ function NewPrompt() {
     const [categories, setCategories] = useState([]);
     const [categoryId, setCategoryId] = useState("");
 
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [saving, setSaving] = useState(false);
+
     useEffect(() => {
-
-        async function loadCategories() {
-
+        const loadCategories = async () => {
             try {
-
                 const response = await api.get("/categories");
 
-                setCategories(response.data);
+                const data = Array.isArray(response.data)
+                    ? response.data
+                    : [];
 
-                if (response.data.length > 0) {
-                    setCategoryId(response.data[0].id);
+                setCategories(data);
+
+                if (data.length > 0) {
+                    setCategoryId(String(data[0].id));
                 }
-
             } catch (error) {
-
-                console.error(error);
-
+                console.error("Failed to load categories:", error);
+            } finally {
+                setLoadingCategories(false);
             }
-
-        }
+        };
 
         loadCategories();
-
     }, []);
 
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
+        if (!categoryId) {
+            alert("Please select a category.");
+            return;
+        }
+
         try {
+            setSaving(true);
 
             await api.post("/prompts", {
-
                 title,
                 description,
                 content,
-                category_id: categoryId
-
+                category_id: Number(categoryId),
             });
 
             navigate("/");
-
         } catch (error) {
-
-            console.error(error);
-
+            console.error("Failed to create prompt:", error);
+            alert("Failed to create prompt.");
+        } finally {
+            setSaving(false);
         }
-
     };
 
     return (
+        <div className="form-page">
+            <Navbar />
 
-        <div style={{ padding: "30px" }}>
+            <div className="form-container">
 
-            <h2>New Prompt</h2>
+                <div className="form-header">
+                    <h1>Create New Prompt</h1>
 
-            <form onSubmit={handleSubmit}>
+                    <p>
+                        Add a new reusable prompt to your library.
+                    </p>
+                </div>
 
-                <input
-                    placeholder="Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-
-                <br /><br />
-
-                <input
-                    placeholder="Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-
-                <br /><br />
-
-                <textarea
-                    rows="10"
-                    cols="70"
-                    placeholder="Prompt..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                />
-
-                <br /><br />
-
-                <select
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
+                <form
+                    className="prompt-form"
+                    onSubmit={handleSubmit}
                 >
 
-                    {
-                        categories.map((category) => (
+                    <div className="form-group">
+                        <label>TITLE</label>
 
-                            <option
-                                key={category.id}
-                                value={category.id}
-                            >
-                                {category.name}
-                            </option>
+                        <input
+                            type="text"
+                            placeholder="e.g. Python Expert"
+                            value={title}
+                            onChange={(e) =>
+                                setTitle(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
 
-                        ))
-                    }
+                    <div className="form-group">
+                        <label>DESCRIPTION</label>
 
-                </select>
+                        <input
+                            type="text"
+                            placeholder="Briefly describe what this prompt does"
+                            value={description}
+                            onChange={(e) =>
+                                setDescription(e.target.value)
+                            }
+                        />
+                    </div>
 
-                <br /><br />
+                    <div className="form-group">
+                        <label>CATEGORY</label>
 
-                <button type="submit">
+                        <select
+                            value={categoryId}
+                            onChange={(e) =>
+                                setCategoryId(e.target.value)
+                            }
+                            disabled={
+                                loadingCategories ||
+                                categories.length === 0
+                            }
+                            required
+                        >
+                            {loadingCategories ? (
+                                <option value="">
+                                    Loading categories...
+                                </option>
+                            ) : categories.length === 0 ? (
+                                <option value="">
+                                    No categories available
+                                </option>
+                            ) : (
+                                categories.map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={String(category.id)}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))
+                            )}
+                        </select>
+                    </div>
 
-                    Save Prompt
+                    <div className="form-group">
+                        <label>PROMPT CONTENT</label>
 
-                </button>
+                        <textarea
+                            placeholder="Write your prompt here..."
+                            value={content}
+                            onChange={(e) =>
+                                setContent(e.target.value)
+                            }
+                            required
+                        />
+                    </div>
 
-            </form>
+                    <div className="form-actions">
 
+                        <button
+                            type="button"
+                            className="cancel-button"
+                            onClick={() => navigate("/")}
+                            disabled={saving}
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            className="save-button"
+                            disabled={saving || !categoryId}
+                        >
+                            {saving
+                                ? "Saving..."
+                                : "Save Prompt"}
+                        </button>
+
+                    </div>
+
+                </form>
+            </div>
         </div>
-
     );
-
 }
 
 export default NewPrompt;
+

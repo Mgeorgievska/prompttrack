@@ -3,26 +3,16 @@ node_modules/
 
 # Environment variables
 .env
-<<<<<<< Updated upstream
-.env.*
-
-=======
-*.env.production
->>>>>>> Stashed changes
+kubernetes/secret.yaml
+prompttrack-backup.sql
+prompttrack-backup-utf8.sql
 
 # Build folders
 dist/
 build/
-dist-ssr/
-
 
 # Logs
 *.log
-
-# Docker image archives
-*.tar
-backend.tar
-frontend.tar
 
 # Operating system files
 .DS_Store
