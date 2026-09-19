@@ -156,7 +156,7 @@ setPrompts(
                         <div>
 
                             <div className="hero-label">
-                                PROMPT LIBRARY
+                                PROMPTTRACK LIBRARY
                             </div>
 
                             <h1>
