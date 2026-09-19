@@ -7,3 +7,11 @@ node_modules
 /generated/prisma
 
 /generated/prisma
+
+# Environment variables
+backend/.env
+frontend/.env
+frontend/.env.production
+
+# Database backups
+*.sql
