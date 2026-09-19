@@ -21,9 +21,9 @@ spec:
       containers:
         - name: frontend
 
-          image: prompttrack-frontend
+          image: mgeorgievska/prompttrack-frontend:latest
 
-          imagePullPolicy: Never
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 80

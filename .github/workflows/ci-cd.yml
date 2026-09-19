@@ -7,11 +7,14 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check Kubernetes access
+        run: kubectl get nodes
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
